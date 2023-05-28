@@ -73,6 +73,7 @@ void handleSerial()
     uint8_t sbuf[len];
     softSerial.readBytes(sbuf, len);
     Serial.write(sbuf, len);
+    Serial.flush();
 
     sendToClients(sbuf, len);
 
@@ -85,6 +86,7 @@ void handleSerial()
     uint8_t sbuf[len];
     Serial.readBytes(sbuf, len);
     softSerial.write(sbuf, len);
+    softSerial.flush();
     led_0.set(shot);
   }
 }
