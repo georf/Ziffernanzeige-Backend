@@ -1,5 +1,4 @@
 #include "main.h"
-SoftwareSerial softSerial;
 
 LedDriver led_0 = LedDriver(LED_BUILTIN, fast_blink, true);
 LedDriver led_1 = LedDriver(LED_1, fast_blink, false);
@@ -8,6 +7,8 @@ LedDriver led_2 = LedDriver(LED_2, fast_blink, false);
 WiFiServer server(PORT);
 WiFiClient serverClients[WIFI_MAX_CLIENTS];
 
+SerialControl serialControl;
+
 unsigned long nextPingTime = 0;
 
 void setup()
@@ -15,7 +16,7 @@ void setup()
   delay(1000);
   Serial.begin(9600);
   delay(1000);
-  softSerial.begin(9600, SWSERIAL_8N1, SOFT_RX, SOFT_TX);
+  serialControl.Startup(&sendToClients);
 
   Serial.print("Debug: Setting soft-AP configuration: ");
   Serial.println(WiFi.softAPConfig(IPAddress(IP_STATION), IPAddress(IP_GATEWAY), IPAddress(IP_SUBNET_MASK)) ? "Ready" : "Failed!");
@@ -67,26 +68,16 @@ void loop()
 
 void handleSerial()
 {
-  if (softSerial.available())
-  {
-    size_t len = softSerial.available();
-    uint8_t sbuf[len];
-    softSerial.readBytes(sbuf, len);
-    Serial.write(sbuf, len);
-    Serial.flush();
-
-    sendToClients(sbuf, len);
-
+  if (serialControl.handle())
     led_1.set(shot);
-  }
 
   if (Serial.available())
   {
     size_t len = Serial.available();
     uint8_t sbuf[len];
     Serial.readBytes(sbuf, len);
-    softSerial.write(sbuf, len);
-    softSerial.flush();
+    serialControl.softSerial.write(sbuf, len);
+    serialControl.softSerial.flush();
     led_0.set(shot);
   }
 }

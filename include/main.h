@@ -1,11 +1,8 @@
 #include <Arduino.h>
 // #include <EEPROM.h>
-#include "SoftwareSerial.h"
 #include "LedDriver.h"
+#include "SerialControl.h"
 #include <ESP8266WiFi.h>
-
-#define SOFT_TX D6
-#define SOFT_RX D7
 
 #define LED_1 D8
 #define LED_2 D5
